@@ -1,4 +1,5 @@
 #include "Iterator.h"
+#include <utility>
 #include <stack>
 
 template<class T>
@@ -53,16 +54,13 @@ public:
     {
         
         Iterator_inorder ret;
-        Node<T>* r=root;
-        pair<T> pi(r,0);        
-        ret.st.push(pi);
+        Node<T>* r=root;       
+        ret.st.push( std::make_pair(r,0) );
         r = r->son[0];
         
         while(r)
         {
-            ret.st.top().status = 1;
-            pair<T> ps(r,0);
-            ret.st.push(ps);
+            ret.st.push( std::make_pair(r,1) );
             r=r->son[0];
         }
         
@@ -81,8 +79,7 @@ public:
     {        
         Iterator_preorder ret;
         Node<T>* r=root;
-        pair<T> pi(r,0);
-        ret.st.push(pi);        
+        ret.st.push( std::make_pair(r,0));        
         return ret;
     }
     
@@ -97,19 +94,10 @@ public:
         Iterator_postorder ret;
         Node<T>* r=root;
         
-        ret.stt.push(r); 
+        ret.st.push( std::make_pair(r,0) );
+        ret++;        
+        return ret;  
         
-        while( r->son[0] ){
-          r=r->son[0];
-          ret.stt.push(r);    
-        }
-        // for ()  Doesnt works
-    
-        if(r->son[1]){
-            ret.stt.push(r->son[1]);
-        }
-               
-        return ret;
     }
     
     Iterator_postorder end_post_order()

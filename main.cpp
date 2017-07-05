@@ -9,17 +9,22 @@ using namespace std;
 int main(){
     Tree<float> t;
     
-    t.insert(3);
-    t.insert(2);
+    t.insert(9);
     t.insert(4);
+    t.insert(2);
+    t.insert(3);
     t.insert(1);
-    t.insert(1.5);
+    t.insert(12);
+    t.insert(15);
+    t.insert(10);
+    t.insert(14);
+    t.insert(13);
     
     CIterator_postorder<float> i;
-    i=t.begin_post_order();
+    i = t.begin_post_order();
     
     
-    for(i=t.begin_post_order(); i!=t.end_post_order(); i++)
+    for(i = t.begin_post_order(); i != t.end_post_order(); i++)
     {
         cout << *i << endl; 
         cin.get();

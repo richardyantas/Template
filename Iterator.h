@@ -1,23 +1,14 @@
 #include "Node.h"
+#include <utility>
 
-template<typename T>
-struct pair
-{
-    Node<T>* ptr;
-    int status;    
-    pair(Node<T>* _ptr,int _status)
-    {
-            ptr = _ptr;
-            status = _status;
-    }    
-};
+#define status second
+#define node first
 
 template<class T>
 class CIterator_inorder{
     
 public:
-    std::stack< pair<T> > st;
-    std::stack< Node<T>* > stt;
+    std::stack< std::pair<Node<T>*,T> > st;
     
     CIterator_inorder(){}
     
@@ -47,11 +38,9 @@ public:
             if( st.top().status == 0 )
                 {
                 st.top().status=1;
-                if(st.top().ptr->son[0])
-                    {
-                    pair<T> t(st.top().ptr->son[0],0);
-                    st.push(t);
-                    
+                if(st.top().node->son[0])
+                {                
+                    st.push( make_pair( st.top().node,0 ) );                
                 }
             }
             else if(st.top().status==1)
@@ -61,12 +50,11 @@ public:
             }
             else if(st.top().status==2)
             {
-                Node<T>* temp = st.top().ptr;
+                Node<T>* temp = st.top().node;
                 st.pop();
                 if(temp->son[1])
-                {
-                    pair<T> t(temp->son[1],0);
-                    st.push(t);
+                {           
+                    st.push( make_pair( temp.top().node, 0 ) );
                 }
             }
             
@@ -82,7 +70,7 @@ template<class T>
 class CIterator_preorder{
     
 public:
-    std::stack< pair<T> > st;
+    std::stack< std::pair< Node<T>*,T> > st;
     
     CIterator_preorder(){}
 
@@ -100,7 +88,7 @@ public:
     
     T operator *()
     {
-        return st.top().ptr->data;
+        return st.top().node->data;
     }
     
     CIterator_preorder<T> operator ++(int) 
@@ -110,9 +98,7 @@ public:
         
         while( !st.empty() && !flag )
         {
-            pair<T> p = st.top(); 
-
-            //std::cout << p.ptr->data <<  " " << p.status  << std::endl;
+            std::pair< Node<T>*,T > p = st.top(); 
             switch( p.status )                                                                                    
             {
                 case 0:
@@ -157,7 +143,7 @@ template<class T>
 class CIterator_postorder{
     
 public:
-    std::stack< Node<T>* > stt;
+    std::stack< std::pair< Node<T>*, T > > st;
     
     CIterator_postorder(){
     }
@@ -166,43 +152,54 @@ public:
         
     void operator = (CIterator_postorder<T> i)
     {  
-        stt = i.stt;
+        st = i.st;
     }
     
     bool operator != (CIterator_postorder<T> i)
     {
-        return !stt.empty();
+        return !st.empty();
     }
     
     T operator *()
     {
-        return stt.top()->data;
+        return st.top().node->data;
     }
     
     CIterator_postorder<T> operator ++(int) 
     {
         
-        while(!stt.empty())
+        while(!st.empty())
         {
-            Node<T>* p = stt.top();            
-            
-            if(p->son[0])
-            { 
-                p = p->son[0];
-                stt.push(p);                                                                                  
+            Node<T>* p = st.top().node;
+             
+            if( st.top().status == 0 )
+            {   
+                st.top().status ++;
+                if( p->son[0])
+                {
+                    p = p->son[0];
+                    st.push( std::make_pair(p,0) );
+                }                                                                                                                            
             }            
-            else if(p->son[1])
-            {              
-                p = p->son[1];  
-                stt.push(p);            
+            else if( st.top().status == 2)
+            {        
+                st.top().status ++;
+                if(p->son[1])
+                {
+                    p = p->son[1];  
+                    st.push( std::make_pair(p,0) );
+                }                        
             }            
-            else
+            else if( st.top().status == 1)                
             {
-                stt.pop();                
-                break;
-            }            
+                st.top().status ++;                                                        
+                return *this;
+            }       
+            else if( st.top().status == 3 )
+            {
+                st.pop();                  
+            }
         }
-        std::cout << "inside" << std::endl;
         return *this;  
         
     }  
